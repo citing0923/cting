@@ -3,785 +3,731 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>影迹·媒体记录本 | 照片视频笔记管理</title>
+    <title>✨ 我们的旅游回忆 · 珍藏每一刻 ✨</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, 'Segoe UI', 'SF Pro Text', 'Inter', 'Helvetica Neue', sans-serif;
+            user-select: none; /* 提升视觉整洁，不影响输入框 */
         }
 
         body {
-            background: linear-gradient(145deg, #f6f9fc 0%, #eef2f5 100%);
-            min-height: 100vh;
+            background: linear-gradient(145deg, #f9eef7 0%, #fce4ec 100%);
+            font-family: 'Segoe UI', 'Quicksand', system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
             padding: 2rem 1.5rem;
+            color: #3e2a2f;
         }
 
         /* 主容器 */
-        .app-container {
-            max-width: 1440px;
+        .memories-container {
+            max-width: 1400px;
             margin: 0 auto;
+            backdrop-filter: blur(2px);
         }
 
-        /* 头部 */
-        .header {
-            margin-bottom: 2rem;
+        /* 标题区 */
+        .hero {
             text-align: center;
+            margin-bottom: 2.5rem;
+            position: relative;
         }
-        .header h1 {
-            font-size: 2.2rem;
-            font-weight: 600;
-            background: linear-gradient(135deg, #1F2B3C, #2A3E55);
+        .hero h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #c44569, #e77f67);
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
-            letter-spacing: -0.3px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
+            letter-spacing: -0.5px;
+            display: inline-block;
+            padding: 0 1rem;
+            text-shadow: 2px 2px 12px rgba(0,0,0,0.05);
         }
-        .header h1::before {
-            content: "🎞️";
-            font-size: 2rem;
+        .hero h1::before {
+            content: "📸";
+            font-size: 2.4rem;
             background: none;
-            -webkit-background-clip: unset;
-            color: #3a6b92;
+            color: #e77f67;
+            margin-right: 12px;
+        }
+        .hero h1::after {
+            content: "🎥";
+            font-size: 2.4rem;
+            background: none;
+            color: #c44569;
+            margin-left: 12px;
         }
         .sub {
-            color: #5a6e7c;
-            margin-top: 0.5rem;
-            font-size: 0.95rem;
-            border-bottom: 1px solid #dce5ec;
+            color: #a56b6f;
+            font-weight: 500;
+            margin-top: 8px;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            border-top: 1px solid #ffcdd2;
             display: inline-block;
-            padding-bottom: 0.3rem;
+            padding-top: 8px;
         }
 
-        /* 两列布局 */
-        .dashboard {
+        /* 双栏卡片布局 (大屏左右，小屏上下) */
+        .content-grid {
             display: flex;
             flex-wrap: wrap;
             gap: 2rem;
         }
-
-        /* 左侧媒体播放器卡片 */
-        .media-preview {
+        .video-section {
             flex: 1.2;
-            min-width: 280px;
-            background: rgba(255,255,255,0.75);
-            backdrop-filter: blur(2px);
-            border-radius: 2rem;
-            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.02);
-            padding: 1.5rem;
-            border: 1px solid rgba(255,255,255,0.6);
-            transition: all 0.2s ease;
+            min-width: 300px;
+        }
+        .photo-section {
+            flex: 2;
+            min-width: 320px;
         }
 
-        .preview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            flex-wrap: wrap;
-            margin-bottom: 1.2rem;
+        /* 公用卡片风格 */
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 245, 240, 0.7);
         }
-        .preview-header h2 {
-            font-size: 1.4rem;
-            font-weight: 500;
-            color: #1e2f3c;
+
+        .card-title {
+            font-size: 1.7rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            border-left: 6px solid #e77f67;
+            padding-left: 16px;
+            color: #5d3a3a;
         }
-        .file-badge {
-            background: #eef2f7;
-            padding: 0.2rem 0.7rem;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            color: #2c5a74;
-            font-weight: 500;
+        .card-title i {
+            font-size: 1.6rem;
         }
 
-        .media-container {
-            background: #0000000c;
+        /* 视频播放器区域 */
+        .video-wrapper {
+            position: relative;
             border-radius: 1.5rem;
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 280px;
-            background: #11181c10;
-            border: 1px solid #e2edf2;
+            background: #1e1a1a;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
             margin-bottom: 1.2rem;
         }
-        video, img {
-            max-width: 100%;
-            max-height: 380px;
+        video {
+            width: 100%;
+            display: block;
+            background: #000;
+            aspect-ratio: 16 / 9;
             object-fit: contain;
-            border-radius: 1rem;
-            transition: 0.2s;
         }
-        .empty-media {
-            text-align: center;
-            color: #8ba0ae;
-            padding: 3rem 1rem;
-            font-size: 0.9rem;
+        .video-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+            background: rgba(245, 225, 225, 0.5);
+            padding: 12px 16px;
+            border-radius: 2rem;
         }
-
-        .file-selector {
+        .video-path {
+            font-size: 0.75rem;
+            font-family: monospace;
+            background: #f1e1e1;
+            padding: 5px 12px;
+            border-radius: 30px;
+            color: #aa6f6f;
+            word-break: break-all;
+            max-width: 65%;
+        }
+        .btn-group {
             display: flex;
             gap: 12px;
-            flex-wrap: wrap;
-            align-items: center;
-            margin-top: 0.8rem;
         }
-        .custom-file-upload {
-            background: #2c4e6e;
-            color: white;
-            padding: 0.6rem 1.2rem;
-            border-radius: 60px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: 0.2s;
+        .btn {
+            background: #ffffffcc;
             border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            backdrop-filter: blur(4px);
+            color: #b95b5b;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .custom-file-upload:hover {
-            background: #1f3e58;
-            transform: scale(0.97);
-        }
-        .file-info {
-            font-size: 0.75rem;
-            color: #4f6f86;
-            background: #eef3f8;
-            padding: 0.3rem 0.8rem;
-            border-radius: 30px;
-            word-break: break-all;
-        }
-        input[type="file"] {
-            display: none;
-        }
-
-        /* 右侧记录面板 */
-        .records-panel {
-            flex: 1.8;
-            min-width: 320px;
-            background: white;
-            border-radius: 2rem;
-            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.08);
-            padding: 1.6rem;
-            border: 1px solid #eef3fa;
-        }
-
-        .form-section {
-            background: #fafdff;
-            border-radius: 1.5rem;
-            padding: 1.2rem;
-            margin-bottom: 2rem;
-            border: 1px solid #e3edf4;
-        }
-        .form-title {
-            font-weight: 600;
-            color: #1f3b4c;
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .input-group {
-            margin-bottom: 1rem;
-        }
-        .input-group label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #2e5a77;
-            margin-bottom: 0.3rem;
-        }
-        .input-group input, .input-group textarea, .input-group select {
-            width: 100%;
-            padding: 0.7rem 1rem;
-            border-radius: 1rem;
-            border: 1px solid #cfdfe8;
-            background: white;
-            font-size: 0.9rem;
-            transition: 0.2s;
-        }
-        .input-group input:focus, .input-group textarea:focus, .input-group select:focus {
-            outline: none;
-            border-color: #2c7da0;
-            box-shadow: 0 0 0 3px rgba(44,125,160,0.1);
-        }
-        textarea {
-            resize: vertical;
-            min-height: 70px;
-        }
-        .form-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 0.5rem;
-            flex-wrap: wrap;
         }
         .btn-primary {
-            background: #2c7da0;
+            background: #e77f67;
             color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
+            box-shadow: 0 4px 8px rgba(231, 127, 103, 0.3);
+        }
+        .btn-primary:hover {
+            background: #d46b51;
+            transform: scale(0.97);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #e77f67;
+            color: #e77f67;
+        }
+        .btn-outline:hover {
+            background: #e77f6710;
+        }
+        .error-msg {
+            color: #d14545;
+            background: #ffe6e6;
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        /* 照片网格区域 */
+        .photo-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 12px;
+        }
+        .upload-area {
+            background: rgba(231, 127, 103, 0.1);
+            border: 2px dashed #e77f67;
             border-radius: 2rem;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+            flex: 1;
             font-weight: 500;
+            color: #b95b5b;
+        }
+        .upload-area:hover {
+            background: rgba(231, 127, 103, 0.2);
+            border-color: #c44569;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1.2rem;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding: 0.3rem 0.2rem;
+        }
+        .photo-card {
+            background: white;
+            border-radius: 1.2rem;
+            overflow: hidden;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+            aspect-ratio: 1 / 1;
+        }
+        .photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.2s;
+        }
+        .photo-card:hover img {
+            transform: scale(1.02);
+        }
+        .photo-card .delete-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.1s;
+            opacity: 0;
+        }
+        .photo-card:hover .delete-btn {
+            opacity: 1;
+        }
+        .delete-btn:hover {
+            background: #d14545;
+            transform: scale(1.05);
+        }
+        .empty-photos {
+            text-align: center;
+            padding: 3rem;
+            color: #aa7a7a;
+            background: #fff1f0;
+            border-radius: 2rem;
+            font-style: italic;
+        }
+
+        /* 模态框 (大图预览) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(12px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        .modal img {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 28px;
+            box-shadow: 0 25px 40px black;
+            border: 4px solid white;
+        }
+        .modal-close {
+            position: absolute;
+            top: 25px;
+            right: 35px;
+            font-size: 2.5rem;
+            color: white;
+            background: rgba(0,0,0,0.5);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             transition: 0.2s;
         }
-        .btn-primary:hover {
-            background: #1f5e7a;
-        }
-        .btn-secondary {
-            background: #e7edf3;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 2rem;
-            font-weight: 500;
-            cursor: pointer;
-            color: #2e5a77;
-        }
-        .btn-secondary:hover {
-            background: #d4e0e8;
-        }
-        .btn-danger {
-            background: #ffe6e5;
-            color: #bc4e4e;
-            border: none;
-            padding: 0.3rem 0.8rem;
-            border-radius: 2rem;
-            font-size: 0.75rem;
-            cursor: pointer;
+        .modal-close:hover {
+            background: #e77f67;
+            transform: rotate(90deg);
         }
 
-        /* 记录列表 */
-        .records-list {
-            margin-top: 1rem;
-            max-height: 460px;
-            overflow-y: auto;
-            padding-right: 5px;
+        /* 滚动条美化 */
+        .photo-grid::-webkit-scrollbar {
+            width: 6px;
         }
-        .record-card {
-            background: #ffffff;
-            border: 1px solid #e9f0f5;
-            border-radius: 1.2rem;
-            padding: 1rem;
-            margin-bottom: 0.9rem;
-            transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        .photo-grid::-webkit-scrollbar-track {
+            background: #ffe0e0;
+            border-radius: 10px;
         }
-        .record-card:hover {
-            background: #fefefe;
-            border-color: #cde0ea;
-            box-shadow: 0 6px 12px -8px rgba(0,0,0,0.1);
-        }
-        .record-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 8px;
-        }
-        .record-title {
-            font-weight: 700;
-            font-size: 1rem;
-            color: #1f3b4c;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .media-type-badge {
-            font-size: 0.65rem;
-            background: #eef3fc;
-            padding: 2px 10px;
-            border-radius: 20px;
-            color: #2c7da0;
-        }
-        .record-date {
-            font-size: 0.7rem;
-            color: #8aa4b5;
-        }
-        .record-path {
-            font-size: 0.75rem;
-            font-family: monospace;
-            background: #f2f6f9;
-            padding: 6px 8px;
-            border-radius: 12px;
-            margin: 8px 0;
-            word-break: break-all;
-            color: #2f5a74;
-        }
-        .record-desc {
-            font-size: 0.85rem;
-            color: #3a5b6e;
-            margin: 8px 0;
-            line-height: 1.4;
-        }
-        .record-actions {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-            margin-top: 8px;
-        }
-        .icon-btn {
-            background: transparent;
-            border: none;
-            font-size: 0.8rem;
-            cursor: pointer;
-            padding: 4px 10px;
-            border-radius: 40px;
-            transition: 0.1s;
-            color: #567e9b;
-        }
-        .icon-btn.edit:hover {
-            background: #e9f0f5;
-            color: #1f5e7a;
-        }
-        .icon-btn.delete:hover {
-            background: #ffe3e2;
-            color: #c24747;
+        .photo-grid::-webkit-scrollbar-thumb {
+            background: #e77f67;
+            border-radius: 10px;
         }
 
-        .empty-records {
-            text-align: center;
-            color: #9bb7c9;
-            padding: 2rem;
-            font-style: italic;
-        }
-        hr {
-            margin: 1rem 0;
-            border: none;
-            border-top: 1px solid #e2edf4;
-        }
         footer {
-            margin-top: 2rem;
             text-align: center;
-            font-size: 0.7rem;
-            color: #8ba5b5;
+            margin-top: 3rem;
+            font-size: 0.8rem;
+            color: #c98d8d;
+            border-top: 1px solid #ffdbdb;
+            padding-top: 1.5rem;
         }
+
         @media (max-width: 780px) {
-            body { padding: 1rem; }
-            .dashboard { flex-direction: column; }
+            body {
+                padding: 1rem;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .card-title {
+                font-size: 1.3rem;
+            }
+            .photo-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                max-height: 50vh;
+            }
         }
     </style>
 </head>
 <body>
-<div class="app-container">
-    <div class="header">
-        <h1>影迹·媒体记录本</h1>
-        <div class="sub">记录每一帧光影 · 珍藏照片与视频的记忆笔记</div>
+
+<div class="memories-container">
+    <div class="hero">
+        <h1>与你 · 旅途拾光</h1>
+        <div class="sub">🌸 每一帧风景，都是心动的证据 🌸</div>
     </div>
 
-    <div class="dashboard">
-        <!-- 左侧媒体预览区 -->
-        <div class="media-preview">
-            <div class="preview-header">
-                <h2>📽️ 媒体预览器</h2>
-                <span class="file-badge">支持 照片/视频</span>
-            </div>
-            <div class="media-container" id="mediaContainer">
-                <div class="empty-media">
-                    🎬 暂未加载媒体<br>点击下方按钮选择照片或视频
+    <div class="content-grid">
+        <!-- 左侧：视频播放区 -->
+        <div class="video-section">
+            <div class="card">
+                <div class="card-title">
+                    🎬 珍藏影像 · 我们的飞行记忆
                 </div>
-            </div>
-            <div class="file-selector">
-                <label class="custom-file-upload">
-                    📂 选择照片或视频
-                    <input type="file" id="mediaFileInput" accept="image/*,video/*">
-                </label>
-                <div class="file-info" id="fileInfoText">未选择文件</div>
-            </div>
-            <div style="margin-top: 1rem; font-size: 0.7rem; color: #7b98ab; background: #f4f9fe; padding: 0.5rem; border-radius: 1rem;">
-                💡 提示：左侧播放器用于预览本地媒体文件，右侧记录本可保存笔记与文件位置路径。
+                <div class="video-wrapper">
+                    <video id="travelVideo" controls preload="metadata" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3Crect width='100%25' height='100%25' fill='%234d2e2e'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffc9c9' font-size='1.2'%3E🎥 回忆即将播放%3C/text%3E%3C/svg%3E">
+                        您的浏览器不支持视频播放，请升级浏览器。
+                    </video>
+                </div>
+                <div class="video-info">
+                    <div class="video-path" id="videoPathDisplay">📁 视频路径: 正在加载...</div>
+                    <div class="btn-group">
+                        <button class="btn btn-outline" id="changeVideoBtn">🔄 更换视频</button>
+                        <button class="btn btn-primary" id="reloadVideoBtn">▶ 重新加载</button>
+                    </div>
+                </div>
+                <div id="videoErrorMsg" class="error-msg" style="display: none;"></div>
+                <div style="margin-top: 10px; font-size: 12px; text-align: center; color: #be8a8a;">
+                    💕 轻触播放，重温旅途中的欢笑与微风
+                </div>
             </div>
         </div>
 
-        <!-- 右侧记录管理 -->
-        <div class="records-panel">
-            <!-- 表单区：新增/编辑记录 -->
-            <div class="form-section">
-                <div class="form-title">
-                    <span>📝</span> <span id="formModeText">新增记录</span>
+        <!-- 右侧：照片墙 (支持上传回忆照片) -->
+        <div class="photo-section">
+            <div class="card">
+                <div class="card-title">
+                    🖼️ 心动瞬间 · 照片墙
                 </div>
-                <input type="hidden" id="editId" value="">
-                <div class="input-group">
-                    <label>标题 *</label>
-                    <input type="text" id="recordTitle" placeholder="例如：大疆无人机航拍片段" autocomplete="off">
+                <div class="photo-toolbar">
+                    <div class="upload-area" id="uploadArea">
+                        📸 + 点击或拖拽上传照片
+                        <input type="file" id="photoInput" multiple accept="image/jpeg,image/png,image/webp,image/bmp,image/gif" style="display: none;">
+                    </div>
+                    <button class="btn btn-outline" id="clearAllPhotosBtn" style="background:#fff0ed;">🗑️ 清空相册</button>
                 </div>
-                <div class="input-group">
-                    <label>媒体类型</label>
-                    <select id="recordType">
-                        <option value="视频">🎥 视频</option>
-                        <option value="照片">📷 照片</option>
-                    </select>
+                <div id="photoGrid" class="photo-grid">
+                    <div class="empty-photos">✨ 点击上方区域，添加上传你们旅途中的合照 / 风景 ✨</div>
                 </div>
-                <div class="input-group">
-                    <label>文件位置 / 路径</label>
-                    <input type="text" id="recordPath" placeholder="例如：C:\Users\cting\Desktop\视频\DJI_20250111191830_0379_D.MP4 或 网盘链接">
-                    <div style="font-size: 0.65rem; color: #7e9bb0; margin-top: 4px;">记录实际存储路径或备注，方便日后查找</div>
+                <div style="margin-top: 12px; font-size: 12px; text-align: right; color:#b27a7a;">
+                    点击图片可放大 · 右上角删除
                 </div>
-                <div class="input-group">
-                    <label>描述 / 备注</label>
-                    <textarea id="recordDesc" placeholder="写下关于这段视频/照片的故事、拍摄心得、重要回忆..."></textarea>
-                </div>
-                <div class="form-buttons">
-                    <button class="btn-primary" id="saveRecordBtn">💾 保存记录</button>
-                    <button class="btn-secondary" id="cancelEditBtn">取消编辑</button>
-                </div>
-            </div>
-
-            <!-- 记录列表展示区 -->
-            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
-                <span class="form-title" style="margin-bottom:0;">📚 我的媒体笔记</span>
-                <span style="font-size:0.7rem; background:#eef2f6; padding:0.2rem 0.6rem; border-radius:40px;" id="recordCount">0条记录</span>
-            </div>
-            <div id="recordsListContainer" class="records-list">
-                <div class="empty-records">✨ 暂无记录，添加第一条媒体笔记吧～</div>
             </div>
         </div>
     </div>
-    <footer>影迹·媒体记录本 | 本地存储您的笔记数据，媒体文件需手动通过左侧预览器打开</footer>
+    <footer>
+        💖 属于我们的独家回忆录 | 视频与照片共同谱写爱的游记 💖
+    </footer>
+</div>
+
+<!-- 大图预览模态框 -->
+<div id="imageModal" class="modal">
+    <span class="modal-close">&times;</span>
+    <img id="modalImage" src="" alt="回忆大图">
 </div>
 
 <script>
-    // ---------- 存储KEY ----------
-    const STORAGE_KEY = 'MediaJournalApp';
-
-    // 全局记录数组
-    let mediaRecords = [];
-
-    // 当前编辑的ID (null表示新增模式)
-    let editingId = null;
-
-    // DOM 元素
-    const mediaFileInput = document.getElementById('mediaFileInput');
-    const mediaContainer = document.getElementById('mediaContainer');
-    const fileInfoText = document.getElementById('fileInfoText');
-    const recordTitleInput = document.getElementById('recordTitle');
-    const recordTypeSelect = document.getElementById('recordType');
-    const recordPathInput = document.getElementById('recordPath');
-    const recordDescTextarea = document.getElementById('recordDesc');
-    const saveRecordBtn = document.getElementById('saveRecordBtn');
-    const cancelEditBtn = document.getElementById('cancelEditBtn');
-    const recordsListContainer = document.getElementById('recordsListContainer');
-    const recordCountSpan = document.getElementById('recordCount');
-    const formModeTextSpan = document.getElementById('formModeText');
-
-    // 辅助函数: 保存记录至localStorage
-    function saveToLocalStorage() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(mediaRecords));
-    }
-
-    // 加载初始数据
-    function loadRecordsFromStorage() {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            try {
-                mediaRecords = JSON.parse(stored);
-                if (!Array.isArray(mediaRecords)) mediaRecords = [];
-            } catch(e) { mediaRecords = []; }
-        } else {
-            // 添加一条示例记录（演示如何记录那个视频路径，用户可自行编辑/删除）
-            mediaRecords = [
-                {
-                    id: Date.now() + 1,
-                    title: "大疆无人机航拍素材",
-                    type: "视频",
-                    path: "C:\\Users\\cting\\Desktop\\视频\\DJI_20250111191830_0379_D.MP4",
-                    description: "傍晚航拍城市天际线，光线非常美，使用DJI Mini 3 Pro拍摄，后期调色偏青橙色调。",
-                    createdAt: new Date().toLocaleString()
-                },
-                {
-                    id: Date.now() + 2,
-                    title: "周末露营照片",
-                    type: "照片",
-                    path: "D:\\照片\\露营\\camping_night.jpg",
-                    description: "篝火晚会，星空璀璨，朋友合影。",
-                    createdAt: new Date().toLocaleString()
-                }
-            ];
-            saveToLocalStorage();
+    // ---------- 视频配置 ----------
+    // 用户指定的绝对路径 (Windows格式转换为file://协议)
+    const SPECIFIED_VIDEO_PATH = "C:\\Users\\cting\\Desktop\\视频\\DJI_20250111191830_0379_D.MP4";
+    // 转换为URI可用的 file:// 格式
+    function toFileUrl(filePath) {
+        // 将反斜杠转为正斜杠，并处理空格及特殊字符
+        let normalized = filePath.replace(/\\/g, '/');
+        // 如果路径开头没有盘符格式处理，通常Windows下是 C:/xxx
+        if (!normalized.match(/^[a-zA-Z]:\//)) {
+            // 如果已经是file://开头就跳过
+            if (normalized.startsWith('file://')) return normalized;
+            // 否则尝试添加file协议
+            return 'file:///' + normalized;
         }
-        renderRecordsList();
+        return 'file:///' + normalized;
     }
 
-    // 渲染记录列表
-    function renderRecordsList() {
-        if (!recordsListContainer) return;
-        if (!mediaRecords.length) {
-            recordsListContainer.innerHTML = `<div class="empty-records">📭 暂无记录，添加一条媒体笔记吧～</div>`;
-            recordCountSpan.innerText = `0条记录`;
+    const videoElement = document.getElementById('travelVideo');
+    const videoPathSpan = document.getElementById('videoPathDisplay');
+    const errorMsgDiv = document.getElementById('videoErrorMsg');
+    let currentVideoSrc = null;
+
+    // 尝试加载视频
+    function loadVideoFromPath(fileUrl, showUserPath = true) {
+        if (showUserPath) {
+            videoPathSpan.innerHTML = `📁 视频路径: ${SPECIFIED_VIDEO_PATH}`;
+        }
+        // 停止之前的加载
+        videoElement.pause();
+        videoElement.removeAttribute('src');
+        videoElement.load();
+        
+        // 设置新源
+        videoElement.src = fileUrl;
+        currentVideoSrc = fileUrl;
+        errorMsgDiv.style.display = 'none';
+        
+        // 监听错误
+        videoElement.onerror = (e) => {
+            console.warn("视频加载失败", e);
+            let errorDetail = '';
+            switch (videoElement.error?.code) {
+                case 1: errorDetail = '视频加载被中止。'; break;
+                case 2: errorDetail = '网络错误，无法获取视频。'; break;
+                case 3: errorDetail = '视频解码失败，可能格式不支持。'; break;
+                case 4: errorDetail = '视频路径无效或文件不存在。'; break;
+                default: errorDetail = '未知错误。';
+            }
+            errorMsgDiv.innerHTML = `⚠️ 无法播放视频：${errorDetail}<br> 您可以点击「更换视频」手动选择该文件 (路径: ${SPECIFIED_VIDEO_PATH})`;
+            errorMsgDiv.style.display = 'block';
+            videoElement.poster = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3Crect width='100%25' height='100%25' fill='%233d2b2b'/%3E%3Ctext x='50%25' y='50%25' fill='%23ffbaba' text-anchor='middle' dominant-baseline='middle' font-size='1'%3E视频加载失败%3C/text%3E%3C/svg%3E";
+        };
+        
+        videoElement.oncanplay = () => {
+            errorMsgDiv.style.display = 'none';
+        };
+        videoElement.load();
+    }
+
+    // 初始化加载用户指定视频
+    function initVideo() {
+        const fileUrl = toFileUrl(SPECIFIED_VIDEO_PATH);
+        loadVideoFromPath(fileUrl, true);
+    }
+    
+    // 更换视频 (用户手动选择)
+    function selectNewVideo() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'video/mp4,video/quicktime,video/x-m4v,video/*';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const objectUrl = URL.createObjectURL(file);
+                loadVideoFromPath(objectUrl, false);
+                videoPathSpan.innerHTML = `📁 当前视频: ${file.name} (临时预览)`;
+                // 提示用户原始固定路径不可用时可临时替换，但保留持久显示
+                errorMsgDiv.style.display = 'none';
+                // 注意：objectUrl 在页面刷新后会失效，但本次观看完全足够
+                videoElement.onloadeddata = () => {};
+            } else {
+                alert('未选择视频文件');
+            }
+        };
+        input.click();
+    }
+    
+    // 重新加载固定路径视频 (恢复默认)
+    function reloadDefaultVideo() {
+        const fileUrl = toFileUrl(SPECIFIED_VIDEO_PATH);
+        loadVideoFromPath(fileUrl, true);
+    }
+    
+    // ---------- 照片墙功能 ----------
+    // 存储照片对象 { id, blobUrl, file? 为了释放内存 }
+    let photosArray = [];
+    let nextId = 1;
+    const photoGrid = document.getElementById('photoGrid');
+    const photoInput = document.getElementById('photoInput');
+    const uploadArea = document.getElementById('uploadArea');
+    const clearAllBtn = document.getElementById('clearAllPhotosBtn');
+    
+    // 渲染照片墙
+    function renderPhotoGrid() {
+        if (!photoGrid) return;
+        if (photosArray.length === 0) {
+            photoGrid.innerHTML = `<div class="empty-photos">✨ 点击上方区域，添加上传你们旅途中的合照 / 风景 ✨</div>`;
             return;
         }
-        recordCountSpan.innerText = `${mediaRecords.length}条记录`;
         let html = '';
-        mediaRecords.forEach(record => {
-            const typeIcon = record.type === '视频' ? '🎥' : '🖼️';
-            // 限制描述显示长度
-            const shortDesc = record.description ? (record.description.length > 70 ? record.description.substring(0,70)+'…' : record.description) : '无描述';
+        photosArray.forEach(photo => {
             html += `
-                <div class="record-card" data-id="${record.id}">
-                    <div class="record-header">
-                        <div class="record-title">
-                            ${typeIcon} ${escapeHtml(record.title)}
-                            <span class="media-type-badge">${escapeHtml(record.type)}</span>
-                        </div>
-                        <div class="record-date">📅 ${escapeHtml(record.createdAt || '未知日期')}</div>
-                    </div>
-                    <div class="record-path">
-                        📍 ${escapeHtml(record.path || '未记录位置')}
-                    </div>
-                    <div class="record-desc">
-                        ${escapeHtml(shortDesc)}
-                    </div>
-                    <div class="record-actions">
-                        <button class="icon-btn edit" data-id="${record.id}">✏️ 编辑</button>
-                        <button class="icon-btn delete" data-id="${record.id}">🗑️ 删除</button>
-                    </div>
+                <div class="photo-card" data-id="${photo.id}">
+                    <img src="${photo.blobUrl}" alt="旅游回忆" loading="lazy">
+                    <button class="delete-btn" data-id="${photo.id}" title="删除这张照片">✕</button>
                 </div>
             `;
         });
-        recordsListContainer.innerHTML = html;
-
-        // 绑定编辑删除事件 (事件委托)
-        document.querySelectorAll('.edit').forEach(btn => {
+        photoGrid.innerHTML = html;
+        
+        // 绑定删除事件 (事件委托)
+        document.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const id = parseInt(btn.getAttribute('data-id'));
-                startEditRecord(id);
+                deletePhotoById(id);
             });
         });
-        document.querySelectorAll('.delete').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+        // 绑定点击放大图片
+        document.querySelectorAll('.photo-card img').forEach(img => {
+            img.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const id = parseInt(btn.getAttribute('data-id'));
-                deleteRecordById(id);
+                const parentCard = img.closest('.photo-card');
+                if (parentCard) {
+                    const photoId = parseInt(parentCard.getAttribute('data-id'));
+                    const photo = photosArray.find(p => p.id === photoId);
+                    if (photo && photo.blobUrl) {
+                        openModal(photo.blobUrl);
+                    }
+                }
             });
         });
     }
-
-    // 简单的防XSS
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-            return c;
+    
+    function deletePhotoById(id) {
+        const index = photosArray.findIndex(p => p.id === id);
+        if (index !== -1) {
+            const photo = photosArray[index];
+            if (photo.blobUrl) {
+                URL.revokeObjectURL(photo.blobUrl);  // 释放内存
+            }
+            photosArray.splice(index, 1);
+            renderPhotoGrid();
+        }
+    }
+    
+    function clearAllPhotos() {
+        if (photosArray.length > 0 && confirm('确定要清空所有照片吗？回忆虽删，甜蜜永存～')) {
+            photosArray.forEach(photo => {
+                if (photo.blobUrl) URL.revokeObjectURL(photo.blobUrl);
+            });
+            photosArray = [];
+            renderPhotoGrid();
+        } else if (photosArray.length === 0) {
+            // 已经是空的
+        }
+    }
+    
+    // 添加多张照片
+    function addPhotos(files) {
+        if (!files || files.length === 0) return;
+        for (let file of files) {
+            if (!file.type.startsWith('image/')) {
+                continue;
+            }
+            const blobUrl = URL.createObjectURL(file);
+            photosArray.push({
+                id: nextId++,
+                blobUrl: blobUrl,
+                fileName: file.name
+            });
+        }
+        renderPhotoGrid();
+    }
+    
+    // 拖拽上传处理
+    function setupDragAndDrop() {
+        const dropZone = uploadArea;
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        dropZone.addEventListener('dragover', () => {
+            dropZone.style.background = 'rgba(231, 127, 103, 0.3)';
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.background = 'rgba(231, 127, 103, 0.1)';
+        });
+        dropZone.addEventListener('drop', (e) => {
+            dropZone.style.background = 'rgba(231, 127, 103, 0.1)';
+            const files = e.dataTransfer.files;
+            const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+            if (imageFiles.length) {
+                addPhotos(imageFiles);
+            } else {
+                alert('请拖拽图片文件 (JPG/PNG/WEBP等)');
+            }
         });
     }
-
-    // 新增或更新记录
-    function saveRecord() {
-        const title = recordTitleInput.value.trim();
-        if (!title) {
-            alert('请填写标题');
-            return;
-        }
-        const mediaType = recordTypeSelect.value;
-        const path = recordPathInput.value.trim() || '';
-        const description = recordDescTextarea.value.trim();
-
-        const nowStr = new Date().toLocaleString();
-
-        if (editingId !== null) {
-            // 更新模式
-            const index = mediaRecords.findIndex(r => r.id === editingId);
-            if (index !== -1) {
-                mediaRecords[index] = {
-                    ...mediaRecords[index],
-                    title: title,
-                    type: mediaType,
-                    path: path,
-                    description: description,
-                    updatedAt: nowStr,
-                    createdAt: mediaRecords[index].createdAt || nowStr
-                };
-                saveToLocalStorage();
-                renderRecordsList();
-                resetForm();
-                alert('✅ 记录已更新');
-            } else {
-                alert('记录不存在，可能已被删除');
-                resetForm();
-            }
-        } else {
-            // 新增模式
-            const newId = Date.now();
-            const newRecord = {
-                id: newId,
-                title: title,
-                type: mediaType,
-                path: path,
-                description: description,
-                createdAt: nowStr,
-            };
-            mediaRecords.unshift(newRecord); // 最新在上方
-            saveToLocalStorage();
-            renderRecordsList();
-            resetForm();
-            alert('✨ 记录已保存');
-        }
+    
+    // 模态框逻辑
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const modalClose = document.querySelector('.modal-close');
+    
+    function openModal(imgSrc) {
+        modal.style.display = 'flex';
+        modalImg.src = imgSrc;
     }
-
-    // 开始编辑记录
-    function startEditRecord(id) {
-        const record = mediaRecords.find(r => r.id === id);
-        if (!record) return;
-        editingId = record.id;
-        recordTitleInput.value = record.title;
-        recordTypeSelect.value = record.type;
-        recordPathInput.value = record.path || '';
-        recordDescTextarea.value = record.description || '';
-        formModeTextSpan.innerText = '编辑记录';
-        cancelEditBtn.style.display = 'inline-block';
-        // 滚动到表单
-        document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    function closeModal() {
+        modal.style.display = 'none';
+        modalImg.src = '';
     }
-
-    // 删除记录
-    function deleteRecordById(id) {
-        if (confirm('确定要删除这条媒体笔记吗？')) {
-            mediaRecords = mediaRecords.filter(r => r.id !== id);
-            saveToLocalStorage();
-            renderRecordsList();
-            if (editingId === id) resetForm();
-            alert('已删除记录');
-        }
-    }
-
-    // 重置表单 (清空编辑状态)
-    function resetForm() {
-        editingId = null;
-        recordTitleInput.value = '';
-        recordTypeSelect.value = '视频';
-        recordPathInput.value = '';
-        recordDescTextarea.value = '';
-        formModeTextSpan.innerText = '新增记录';
-        cancelEditBtn.style.display = 'inline-block'; // 始终可见方便取消
-        // 但是取消按钮只是清除编辑状态，不清除已填内容，所以这里clear内容
-        // 另外让取消按钮清除高亮编辑状态
-    }
-
-    // 取消编辑的显式动作
-    function cancelEdit() {
-        if (editingId !== null) {
-            if (confirm('取消编辑，未保存的内容将丢失。确定吗？')) {
-                resetForm();
-            }
-        } else {
-            // 非编辑模式，清空表单内容（可选）
-            if (recordTitleInput.value || recordPathInput.value || recordDescTextarea.value) {
-                if (confirm('清空当前表单内容？')) {
-                    recordTitleInput.value = '';
-                    recordTypeSelect.value = '视频';
-                    recordPathInput.value = '';
-                    recordDescTextarea.value = '';
-                }
-            } else {
-                // 无内容直接清空
-                recordTitleInput.value = '';
-                recordTypeSelect.value = '视频';
-                recordPathInput.value = '';
-                recordDescTextarea.value = '';
-            }
-        }
-    }
-
-    // ----- 左侧媒体预览器逻辑 (独立功能) -----
-    let currentObjectUrl = null;
-
-    function revokeMediaUrl() {
-        if (currentObjectUrl) {
-            URL.revokeObjectURL(currentObjectUrl);
-            currentObjectUrl = null;
-        }
-    }
-
-    function handleFileSelect(file) {
-        revokeMediaUrl();
-        if (!file) {
-            mediaContainer.innerHTML = `<div class="empty-media">🎬 未选择文件<br>点击按钮选取照片或视频</div>`;
-            fileInfoText.innerText = '未选择文件';
-            return;
-        }
-
-        const fileType = file.type;
-        const fileName = file.name;
-        fileInfoText.innerText = `📄 ${fileName} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-
-        const objectUrl = URL.createObjectURL(file);
-        currentObjectUrl = objectUrl;
-
-        if (fileType.startsWith('image/')) {
-            // 显示图片
-            mediaContainer.innerHTML = `<img src="${objectUrl}" alt="预览图片" style="max-width:100%; max-height:380px; border-radius:1rem;">`;
-        } else if (fileType.startsWith('video/')) {
-            // 显示视频播放器
-            mediaContainer.innerHTML = `
-                <video controls autoplay muted style="max-width:100%; max-height:380px; border-radius:1rem;">
-                    <source src="${objectUrl}" type="${fileType}">
-                    您的浏览器不支持视频播放。
-                </video>
-            `;
-        } else {
-            mediaContainer.innerHTML = `<div class="empty-media">⚠️ 不支持的文件类型，请选择图片或视频</div>`;
-            fileInfoText.innerText = '不支持的类型，请选择图片/视频';
-            revokeMediaUrl();
-        }
-    }
-
-    mediaFileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            handleFileSelect(file);
-        } else {
-            revokeMediaUrl();
-            mediaContainer.innerHTML = `<div class="empty-media">🎬 暂未加载媒体<br>点击下方按钮选择照片或视频</div>`;
-            fileInfoText.innerText = '未选择文件';
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    modalClose.addEventListener('click', closeModal);
+    
+    // 监听键盘ESC关闭模态框
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.style.display === 'flex') {
+            closeModal();
         }
     });
-
-    // 按钮事件绑定
-    saveRecordBtn.addEventListener('click', saveRecord);
-    cancelEditBtn.addEventListener('click', cancelEdit);
-
-    // 页面加载时读取存储，渲染记录列表，重置表单
-    loadRecordsFromStorage();
-    resetForm();
-
-    // 可选：在左侧预览器下方增加一个快速填充路径的小提示（将当前选择的文件名填充到路径输入框，方便记录，但不是绝对路径，只是方便）
-    // 添加一个辅助功能：当用户在左侧选择媒体文件后，可以将文件名称自动填入路径输入框的末尾作为参考（非强制）
-    mediaFileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file && file.name) {
-            const currentPath = recordPathInput.value;
-            const hintFileName = file.name;
-            // 不覆盖已有内容，但追加一个提示
-            if (!currentPath.includes(hintFileName)) {
-                // 如果路径输入框是空的或已有内容但没包含文件名，给个友善追加
-                if (currentPath.trim() === '') {
-                    recordPathInput.value = `[已选文件] ${hintFileName}`;
-                } else {
-                    // 不做强制覆盖，但是给个tooltip提示，不自动追加避免烦人
-                }
+    
+    // 初始化照片上传按钮和清空
+    function initPhotoModule() {
+        uploadArea.addEventListener('click', () => {
+            photoInput.click();
+        });
+        photoInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files.length) {
+                addPhotos(Array.from(e.target.files));
+                photoInput.value = ''; // 清空以便再次上传相同文件
             }
+        });
+        clearAllBtn.addEventListener('click', clearAllPhotos);
+        setupDragAndDrop();
+        // 初始时照片墙已经是空状态
+    }
+    
+    // 视频控制按钮
+    document.getElementById('changeVideoBtn').addEventListener('click', selectNewVideo);
+    document.getElementById('reloadVideoBtn').addEventListener('click', () => {
+        if (currentVideoSrc && currentVideoSrc.startsWith('blob:')) {
+            // 如果当前是临时blob视频，询问是否恢复默认路径
+            if (confirm('当前播放的是临时选择的视频，是否恢复到默认的旅游视频路径？')) {
+                reloadDefaultVideo();
+            } else {
+                // 重新加载当前已有链接
+                loadVideoFromPath(currentVideoSrc, false);
+            }
+        } else {
+            reloadDefaultVideo();
         }
     });
-
-    // 页面关闭前清理blob url (可选)
+    
+    // 额外优化：当视频加载成功时，自动清除错误显示
+    videoElement.addEventListener('loadeddata', () => {
+        errorMsgDiv.style.display = 'none';
+    });
+    
+    // 页面启动
+    initVideo();
+    initPhotoModule();
+    
+    // 针对绝对路径可能存在特殊字符，再次确保第一次加载也展示路径文字
+    // 提供友好提示如果视频文件因浏览器安全限制无法加载，告知用户手动选择
+    setTimeout(() => {
+        if (videoElement.readyState === 0 && !videoElement.error) {
+            // 等待一会仍无反应则主动尝试
+            console.log("视频仍在加载中");
+        } else if (videoElement.error) {
+            errorMsgDiv.innerHTML = `⚠️ 未能自动加载预设视频，请点击「更换视频」手动选择位于 "${SPECIFIED_VIDEO_PATH}" 的视频文件。 <br> 💡 小提示：如果文件确实存在，可能是浏览器安全策略限制，手动选取一次即可播放。`;
+            errorMsgDiv.style.display = 'block';
+        }
+    }, 800);
+    
+    // 优雅处理窗口关闭前的blob清理（可选，但不强制）
     window.addEventListener('beforeunload', () => {
-        if (currentObjectUrl) {
-            URL.revokeObjectURL(currentObjectUrl);
+        photosArray.forEach(photo => {
+            if (photo.blobUrl) URL.revokeObjectURL(photo.blobUrl);
+        });
+        if (currentVideoSrc && currentVideoSrc.startsWith('blob:')) {
+            URL.revokeObjectURL(currentVideoSrc);
         }
     });
 </script>
